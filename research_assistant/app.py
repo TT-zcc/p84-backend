@@ -31,7 +31,7 @@ def create_app(config_object="research_assistant.settings"):
     app.config.from_object(config_object)
     CORS(
     app,
-    origins=["https://p84-frontend-final-73-jz1x7gu43-zhijian-wus-projects.vercel.app"],
+    origins=["https://p84-frontend-final-73.vercel.app"],
     supports_credentials=True)
     register_extensions(app)
     csrf_protect.exempt(blueprint)
