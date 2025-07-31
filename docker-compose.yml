@@ -72,18 +72,6 @@ services:
       - db
     networks:
       - shared-net
-
-  swagger-ui:
-    image: swaggerapi/swagger-ui
-    container_name: swagger_ui
-    ports:
-      - "8081:8080"
-    environment:
-      SWAGGER_JSON: /mnt/api.json
-    volumes:
-      - ./Api.json:/mnt/api.json:ro
-    networks:
-      - shared-net
 volumes:
   pgdata:
 
