@@ -7,7 +7,7 @@ FROM python:3.10-slim-bullseye
 # - netcat (nc): Used to check database port availability
 # - Clean up cache to reduce image size
 RUN apt-get update \
-    && apt-get install -y netcat \
+    && apt-get install -y --no-install-recommends netcat-openbsd \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
