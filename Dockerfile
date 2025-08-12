@@ -28,7 +28,13 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
 
 # --------------------------------------
-# Expose application port
+# Render will set the $PORT environment variable automatically
+# Do NOT hardcode 5000 — bind to 0.0.0.0:$PORT
 # --------------------------------------
-# Flask will run on port 5000 inside the container
-EXPOSE 5000
+ENV PORT=5000
+
+# --------------------------------------
+# Start the Flask app via Gunicorn
+# Bind to 0.0.0.0:$PORT so Render can route traffic
+# --------------------------------------
+CMD bash -c "while ! nc -z \${DB_HOST:-localhost} \${DB_PORT:-5432}; do echo 'Waiting for DB...'; sleep 1; done && gunicorn --preload -w \${GUNICORN_WORKERS:-4} -b 0.0.0.0:\${PORT} autoapp:app"
