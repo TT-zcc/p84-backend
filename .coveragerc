@@ -1,0 +1,6 @@
+[run]
+source = research_assistant
+omit = 
+    tests/*
+    autoapp.py
+

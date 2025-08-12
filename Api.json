@@ -1,0 +1,1623 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Research Assistant API Documentation",
+    "version": "1.0.0",
+    "description": "This document provides the official OpenAPI 3.0 specification for the Research Assistant backend services.\n\nIt consolidates all available REST endpoints, including:\n- User Authentication and Management\n- Tags and Settings\n- AI Assistant\n- References Management\n- Research Planning and Outline Tools\n- Brainstorming Module\n- Document Writing and Version Control\n\nDevelopers and integrators can use this documentation to understand available endpoints, request/response structures, authentication requirements, and supported operations for seamless frontend and third-party integration."
+  },
+  "servers": [
+    {
+      "url": "http://localhost:5000",
+      "description": "Local server"
+    }
+  ],
+  "paths": {
+    "/users/register": {
+      "post": {
+        "summary": "Register user",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "example": {
+                "username": "alice",
+                "email": "alice@example.com",
+                "password": "mypassword"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Registration successful",
+            "content": {
+              "application/json": {
+                "example": {
+                  "msg": "Registration successful"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/users/login": {
+      "post": {
+        "summary": "Login user",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "example": {
+                "username": "alice",
+                "password": "mypassword"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "JWT token",
+            "content": {
+              "application/json": {
+                "example": {
+                  "access_token": "<JWT>"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/users/profile": {
+      "get": {
+        "summary": "Get current user profile",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "User profile",
+            "content": {
+              "application/json": {
+                "example": {
+                  "id": 1,
+                  "username": "alice",
+                  "email": "alice@example.com"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/password/reset/": {
+      "post": {
+        "summary": "Reset password",
+        "description": "Reset user password with email and captcha.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "example": {
+                "email": "alice@example.com",
+                "captcha": "123456",
+                "new_password": "newPass"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Password reset success",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": 200,
+                  "message": "Password reset successfully"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/captcha/email/": {
+      "post": {
+        "summary": "Send email verification code",
+        "description": "Request a verification code sent to the provided email address.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "format": "email"
+                  }
+                },
+                "required": [
+                  "email"
+                ]
+              },
+              "example": {
+                "email": "user@example.com"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Verification code sent successfully",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": 200,
+                  "message": "Verification code sent successfully"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Missing email in request",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": 400,
+                  "message": "Email is required"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Failed to send email",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": 500,
+                  "message": "Failed to send email"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "summary": "Send email verification code (GET)",
+        "parameters": [
+          {
+            "name": "email",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "email"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Verification code sent successfully",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": 200,
+                  "message": "Verification code sent successfully"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Missing email in query",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": 400,
+                  "message": "Email is required"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Failed to send email",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": 500,
+                  "message": "Failed to send email"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/settings/": {
+      "get": {
+        "summary": "Get user settings",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "User settings",
+            "content": {
+              "application/json": {
+                "example": {
+                  "username": "Alice",
+                  "email": "alice@example.com",
+                  "language": "en",
+                  "theme": "dark",
+                  "notifications_enabled": true,
+                  "export_format": "pdf"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "User not found"
+          }
+        }
+      },
+      "put": {
+        "summary": "Update user settings",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "language": {
+                    "type": "string"
+                  },
+                  "theme": {
+                    "type": "string"
+                  },
+                  "notifications_enabled": {
+                    "type": "boolean"
+                  },
+                  "export_format": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Settings updated",
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "Settings updated",
+                  "settings": {
+                    "language": "zh",
+                    "theme": "light",
+                    "notifications_enabled": false,
+                    "export_format": "docx"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/settings/profile": {
+      "put": {
+        "summary": "Update user profile",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "username",
+                  "email"
+                ],
+                "properties": {
+                  "username": {
+                    "type": "string"
+                  },
+                  "email": {
+                    "type": "string",
+                    "format": "email"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Profile updated",
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "Profile updated",
+                  "username": "newAlice",
+                  "email": "alice@new.com"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "409": {
+            "description": "Username or email already taken"
+          }
+        }
+      }
+    },
+    "/settings/change-password": {
+      "post": {
+        "summary": "Change user password",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "current_password",
+                  "new_password"
+                ],
+                "properties": {
+                  "current_password": {
+                    "type": "string"
+                  },
+                  "new_password": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Password updated successfully",
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "Password updated successfully"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Missing fields"
+          },
+          "401": {
+            "description": "Incorrect current password"
+          }
+        }
+      }
+    },
+    "/settings/delete": {
+      "delete": {
+        "summary": "Delete user account",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Account deleted",
+            "content": {
+              "application/json": {
+                "example": {
+                  "message": "Account deleted successfully"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "User not found"
+          },
+          "500": {
+            "description": "Server error"
+          }
+        }
+      }
+    },
+    "/planning/": {
+      "get": {
+        "summary": "Fetch planning data",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Sections and timeline"
+          }
+        }
+      },
+      "post": {
+        "summary": "Save planning data",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "example": {
+                "sections": [
+                  {
+                    "title": "Intro",
+                    "summary": "Overview"
+                  }
+                ],
+                "timeline": [
+                  {
+                    "title": "Phase 1",
+                    "tasks": [
+                      {
+                        "description": "Task 1"
+                      }
+                    ]
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Planning saved"
+          }
+        }
+      }
+    },
+    "/planning/{phase_id}": {
+      "delete": {
+        "summary": "Delete phase",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "phase_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Phase deleted"
+          }
+        }
+      }
+    },
+    "/planning/{phase_id}/tasks/{task_id}": {
+      "patch": {
+        "summary": "Toggle task completion",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "phase_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "task_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Task toggled"
+          }
+        }
+      }
+    },
+    "/outline/get": {
+      "get": {
+        "summary": "Get outline",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Outline list"
+          }
+        }
+      }
+    },
+    "/outline/get/{sec_id}": {
+      "get": {
+        "summary": "Get outline section",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "sec_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Outline section"
+          }
+        }
+      }
+    },
+    "/outline/save": {
+      "post": {
+        "summary": "Save outline",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "example": {
+                "outline": [
+                  {
+                    "title": "Section 1",
+                    "subsections": []
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Outline saved"
+          }
+        }
+      }
+    },
+    "/update/{sec_id}": {
+      "put": {
+        "summary": "Update outline section",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "sec_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "example": {
+                "outline": {
+                  "title": "Updated title",
+                  "summary": "updated"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Updated"
+          }
+        }
+      }
+    },
+    "/delete/{sec_id}": {
+      "delete": {
+        "summary": "Delete outline section",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "sec_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Deleted"
+          }
+        }
+      }
+    },
+    "/brainstorm/": {
+      "get": {
+        "summary": "List brainstorm entries",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List"
+          }
+        }
+      },
+      "post": {
+        "summary": "Create brainstorm entry",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "example": {
+                "why": "Because"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created"
+          }
+        }
+      }
+    },
+    "/brainstorm/{entry_id}": {
+      "put": {
+        "summary": "Update brainstorm entry",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "entry_id",
+            "in": "path",
+            "schema": {
+              "type": "integer"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Updated"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete brainstorm entry",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "entry_id",
+            "in": "path",
+            "schema": {
+              "type": "integer"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Deleted"
+          }
+        }
+      }
+    },
+    "/brainstorm/save": {
+      "post": {
+        "summary": "Save brainstorm session",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Session saved"
+          }
+        }
+      }
+    },
+    "/brainstorm/chat": {
+      "post": {
+        "summary": "Chat with brainstorm assistant",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "example": {
+                "message": "Idea"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Reply"
+          }
+        }
+      }
+    },
+    "/brainstorm/progress": {
+      "post": {
+        "summary": "Mark brainstorm step complete",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        }
+      }
+    },
+    "/brainstorm/overall-feedback": {
+      "post": {
+        "summary": "Overall feedback",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Feedback"
+          }
+        }
+      }
+    },
+    "/writing_tool/documents": {
+      "post": {
+        "summary": "Create a new document",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "title": {
+                    "type": "string"
+                  },
+                  "file": {
+                    "type": "string",
+                    "format": "binary"
+                  }
+                },
+                "required": [
+                  "title",
+                  "file"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Document created",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": 0,
+                  "msg": "Document created",
+                  "document_id": 1
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "summary": "List all documents with versions",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of documents",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": 0,
+                  "data": [
+                    {
+                      "document_id": 1,
+                      "title": "Doc 1",
+                      "created_at": "2025-07-30T12:00:00Z",
+                      "versions": [
+                        {
+                          "version_id": 1,
+                          "version": "v1.0",
+                          "uploaded_at": "2025-07-30T12:00:00Z",
+                          "file_size": 2.5,
+                          "is_current": true,
+                          "file_url": "https://s3/file.docx"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/writing_tool/documents/{document_id}/versions": {
+      "post": {
+        "summary": "Upload a new version for an existing document",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "document_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "file": {
+                    "type": "string",
+                    "format": "binary"
+                  }
+                },
+                "required": [
+                  "file"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "New version uploaded",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": 0,
+                  "msg": "New version uploaded",
+                  "version": "v1.1"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/writing_tool/documents/{document_id}/versions/{version_id}/download": {
+      "get": {
+        "summary": "Download a specific document version",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "document_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "version_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Download link",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": 0,
+                  "file_url": "https://s3/download-link"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/writing_tool/documents/{document_id}/versions/{version_id}": {
+      "delete": {
+        "summary": "Delete a specific version of a document",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "document_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "version_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Version deleted",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": 0,
+                  "msg": "Version and file deleted"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/writing_tool/documents/{document_id}": {
+      "delete": {
+        "summary": "Delete an entire document with all its versions",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "document_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Document deleted",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": 0,
+                  "msg": "Document and all files deleted"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/tags/": {
+      "post": {
+        "summary": "Create tag",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "name"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Created tag",
+            "content": {
+              "application/json": {
+                "example": {
+                  "id": 1,
+                  "name": "AI"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/tags/list": {
+      "get": {
+        "summary": "List all user tags",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of tags",
+            "content": {
+              "application/json": {
+                "example": [
+                  {
+                    "id": 1,
+                    "name": "AI"
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "/tags/stats": {
+      "get": {
+        "summary": "Tag usage statistics",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Usage count per tag",
+            "content": {
+              "application/json": {
+                "example": [
+                  {
+                    "tag": "AI",
+                    "count": 3
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "/tags/assign": {
+      "post": {
+        "summary": "Assign tag to document",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "document_id",
+                  "tag"
+                ],
+                "properties": {
+                  "document_id": {
+                    "type": "integer"
+                  },
+                  "tag": {
+                    "type": "string"
+                  }
+                }
+              },
+              "example": {
+                "document_id": 1,
+                "tag": "machine learning"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Tag assigned to document",
+            "content": {
+              "application/json": {
+                "example": {
+                  "msg": "Tag 'machine learning' assigned to Document 'AI Paper'"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/tags/remove": {
+      "delete": {
+        "summary": "Remove tag from document",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Tag removed from document"
+          },
+          "400": {
+            "description": "Tag not assigned"
+          }
+        },
+        "parameters": [
+          {
+            "name": "document_id",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "tag_id",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ]
+      }
+    },
+    "/tags/all-docs-with-tags": {
+      "get": {
+        "summary": "Get all documents with tags",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of documents with tag info"
+          }
+        }
+      }
+    },
+    "/tags/mark-complete": {
+      "post": {
+        "summary": "Mark document as complete",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "document_id",
+                  "completed"
+                ],
+                "properties": {
+                  "document_id": {
+                    "type": "integer"
+                  },
+                  "completed": {
+                    "type": "boolean"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Completion state updated"
+          }
+        }
+      }
+    },
+    "/tags/update": {
+      "put": {
+        "summary": "Rename tag",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "tag_id",
+                  "new_name"
+                ],
+                "properties": {
+                  "tag_id": {
+                    "type": "integer"
+                  },
+                  "new_name": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Tag renamed"
+          }
+        }
+      }
+    },
+    "/tags/delete": {
+      "delete": {
+        "summary": "Delete tag",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Tag deleted"
+          }
+        },
+        "parameters": [
+          {
+            "name": "tag_id",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ]
+      }
+    },
+    "/ai/ask": {
+      "post": {
+        "summary": "Ask question to Gemini AI model",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "question"
+                ],
+                "properties": {
+                  "question": {
+                    "type": "string",
+                    "description": "The question to ask the model"
+                  }
+                },
+                "example": {
+                  "question": "What is AI?"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "AI-generated answer",
+            "content": {
+              "application/json": {
+                "example": {
+                  "answer": "AI stands for Artificial Intelligence..."
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Missing question",
+            "content": {
+              "application/json": {
+                "example": {
+                  "error": "Missing question"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Model error or configuration issue",
+            "content": {
+              "application/json": {
+                "example": {
+                  "error": "Gemini model is not available or not configured."
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/references/": {
+      "post": {
+        "summary": "Add a new reference",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "title",
+                  "authors",
+                  "year"
+                ],
+                "properties": {
+                  "title": {
+                    "type": "string"
+                  },
+                  "authors": {
+                    "type": "string"
+                  },
+                  "year": {
+                    "type": "integer"
+                  },
+                  "source": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created reference",
+            "content": {
+              "application/json": {
+                "example": {
+                  "id": 1,
+                  "title": "A Study on AI",
+                  "authors": "John Doe",
+                  "year": 2023,
+                  "source": "Nature",
+                  "user_id": 7
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "summary": "List all references",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "sort_by",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of references",
+            "content": {
+              "application/json": {
+                "example": [
+                  {
+                    "id": 1,
+                    "title": "AI",
+                    "authors": "A B",
+                    "year": 2023,
+                    "source": "Journal",
+                    "user_id": 1
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    "/references/{ref_id}/cite": {
+      "get": {
+        "summary": "Generate citation",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "style",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "default": "APA"
+            }
+          },
+          {
+            "name": "ref_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Formatted citation",
+            "content": {
+              "application/json": {
+                "example": {
+                  "citation": "Doe, J. (2023). A Study on AI. Nature Journal."
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/dashboard/phases": {
+      "get": {
+        "summary": "Fetch dashboard planning phases",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of planning phases with completion status",
+            "content": {
+              "application/json": {
+                "example": {
+                  "code": 0,
+                  "data": [
+                    {
+                      "id": 1,
+                      "title": "Define Topic & Question",
+                      "status": "Completed"
+                    },
+                    {
+                      "id": 2,
+                      "title": "Literature Review",
+                      "status": "NotCompleted"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    }
+  }
+}
