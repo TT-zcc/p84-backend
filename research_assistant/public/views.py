@@ -14,6 +14,18 @@ from research_assistant.user.models import EmailCaptcha, User
 
 blueprint = Blueprint("public", __name__, static_folder="../static")
 
+@blueprint.route("/", methods=["GET"])
+def home():
+    """
+    API endpoint for service health check or greeting.
+    """
+    current_app.logger.info("Hello from the home page (API)!")
+    return jsonify({
+        "code": 0,
+        "msg": "API service is running",
+        "data": {}
+    })
+    
 @blueprint.route("/logout/", methods=["POST"])
 @login_required
 def logout():
@@ -25,7 +37,6 @@ def logout():
         "code": 0,
         "msg": "Logout successful"
     })
-
 
 @csrf_protect.exempt
 @blueprint.route("/captcha/email/", methods=["GET", "POST"])
