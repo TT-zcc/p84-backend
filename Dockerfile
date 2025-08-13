@@ -1,5 +1,5 @@
 # Use the official Python 3.10 slim image based on Debian Bullseye
-FROM python:3.10-slim-bullseye
+FROM python:3.13-slim-bullseye
 
 # --------------------------------------
 # Install system dependencies
